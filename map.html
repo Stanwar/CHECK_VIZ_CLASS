@@ -1,0 +1,737 @@
+`<!DOCTYPE html>
+<html lang="en">
+<!-- Group 6 -->
+
+<head>
+    <title>Right Here!!Right Now!!</title>
+
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7/leaflet.css" />
+
+
+    <link href='http://fonts.googleapis.com/css?family=Lato&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="css/leaflet.awesome-markers.css">
+    <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz" />
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet">
+    <link href="bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/leaflet-routing-machine.css" />
+
+    <link rel="stylesheet" type="text/css" href="css/mapstyle.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">
+    <link rel="stylesheet" href="css/sb-admin.css">
+    <link rel="stylesheet" href="css/leaflet.label.css" />
+
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="js/ClassExtension.js"></script>
+    <script src="http://coffeescript.org/extras/coffee-script.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/numeral.js/1.4.5/numeral.min.js"></script>
+    <script src="js/FeatureGroup.Label.js"></script> -->
+    <script src="data/zipMarkers.js"></script>
+    <script src="http://cdn.leafletjs.com/leaflet-0.7/leaflet.js"></script>
+    <script src="js/jquery.js"></script>
+    <script src="http://code.highcharts.com/highcharts.js"></script>
+    <script src="http://code.highcharts.com/modules/data.js"></script>
+    <script src="http://code.highcharts.com/modules/drilldown.js"></script>
+
+    <script src="js/leaflet-editable-polyline.js"></script>
+
+    <script src="js/zipcodeboundary.js"></script>
+    <script src="bootstrap/js/bootstrap.js"></script>
+    <script src="bootstrap/js/bootstrap.min.js"></script>
+    <script src="js/leaflet.awesome-markers.js"></script>
+    <script src="js/leaflet-routing-machine.js"></script>
+    <script src="js/moment.js"></script>
+    <script src="http://code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
+    <script src="data/zipcodeJson.js"></script>
+    <script src="data/zipcodes.js"></script>
+    <script src="data/illinois.js"></script>
+    <script src="data/countyJson.js"></script>
+    <script src="data/IllinoisDetails.js"></script>
+    <script src="js/leaflet.label-src.js"></script>
+
+</head>
+
+<script>
+    function toggleHelp() {
+        if (d3.select("#help").attr('style') == "visibility: hidden;") {
+            d3.select("#help").attr('style', 'visibility: visible;');
+        } else {
+            d3.select("#help").attr('style', 'visibility: hidden;');
+        }
+    }
+    $(function() {
+        $("#twitter-button").accordion({
+            heightStyle: "content",
+            collapsible: true,
+            active: false
+        });
+    });
+    $(function() {
+        $("#tabs").tabs();
+    });
+</script>
+
+<body onload="init()">
+
+    <div id='wrapper'>
+            <!-- <div id="map"></div> -->
+        <!-- Navigation -->
+        <div id="nav22">
+        <nav class='navbar navbar-inverse navbar-fixed-top' role='navigation' id="navigation-id">
+            <!-- Brand and toggle get grouped for better mobile display -->
+
+            <div class='navbar-header' >
+                <button type='button' class='navbar-toggle' data-toggle="collapse" data-target='.navbar-ex1-collapse'>
+                    <span class='sr-only'>Toggle navigation</span>
+                    <span class='icon-bar'></span>
+                    <span class='icon-bar'></span>
+                    <span class='icon-bar'></span>
+                </button>
+                <a class='navbar-brand' href=''>CRI</a> 
+            </div>
+            <!-- Top Menu Items -->
+            <ul class='nav navbar-right top-nav'>
+                <div id="help" style="visibility: hidden;">
+                    <h3>How to Navigate</h3><p>Filter data according to the source, disease type and age</p><br />
+                </div>
+                <img id="helpbutton" onclick="toggleHelp()" src="images/help.png" />
+                <!--<input type="button" name="collapse" onclick="disappear()">Collapse -->
+                <li class='dropdown'>
+                    <a href='#' class='dropdown-toggle' data-toggle='dropdown'><i class='fa fa-user'></i>  <b class='caret'></b></a>
+                </li>
+            </ul>
+            <!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->
+            <div class='collapse navbar-collapse navbar-ex1-collapse' id="navigation_collapse">
+                <ul class='nav navbar-nav side-nav'>
+                    <li class='active'>
+                        <a href=#><i class='fa fa-fw fa-dashboard'></i><b>Home</b></a>
+                    </li>
+                    <li >
+                        <!-- Selecting the Data Source for Further down layers-->
+                        <a href='javascript:;' data-toggle='collapse' data-target='#client' >
+                        <i class='fa fa-fw fa-arrows-v'></i> Sources <i class='fa fa-fw fa-caret-down'></i></a>
+                        <ul id="client" class="collapse inverse">
+                            <li>
+                               <a href=# id="uihpview_select">UIHP+</a>
+                            </li>
+                            <li>
+                               <a href=# id="eligibleview_select">CHECK-Eligible</a>
+                            </li>
+                            <li>
+                               <a href=# id="enrolledview_select">CHECK-Enrolled</a>
+                            </li>
+
+                        </ul>
+                    </li>
+                    <li class='dark2'>
+                        <a href='javascript:;' data-toggle='collapse' data-target='#Views'><i class='fa fa-fw fa-arrows-v'></i> Views <i class='fa fa-fw fa-caret-down'></i></a>
+                        <ul id='Views' class='collapse inverse'>
+                            <li>
+                                <a href=# id="zipview_select"></i>ZipCodes</a>
+                            </li>
+                            <li>
+                                <a href=# id="neighborhoods"><i class='fa fa-user-plus'></i> Neighborhoods</a>
+                            </li>
+                            <li>
+                                <a href=# id="counties"><i class='fa fa-user-plus'></i> Counties</a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <li class='dark3'>
+                        <a href="javascript:;" data-toggle="collapse" data-target="#ages"><i class="fa fa-fw fa-arrows-v"></i> Age Groups <i class="fa fa-fw fa-caret-down"></i></a>
+                        <ul id="ages" class="collapse" style="color:white">
+                            <li style="padding-top:15px; padding-bottom:15px; padding-left:30px" >
+                                <input type="radio" name="radio_ages" id="radio_ages" value = "TOTAL">Total
+                                <input type="radio" name="radio_ages" id="radio_ages" value = "UNDER">< 25
+                                <input type="radio" name="radio_ages" id="radio_ages" value = "ABOVE">> 25
+                            </li>
+                            
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="javascript:;" data-toggle="collapse" data-target="#encounter"><i class="fa fa-fw fa-arrows-v"></i> Encounter Groups <i class="fa fa-fw fa-caret-down"></i></a>
+                        <ul id="encounter" class="collapse" style="color:white">
+
+                            <li  style="padding-top:15px; padding-bottom:15px; padding-left:30px">
+                                <input type="checkbox" id="radio_encounters" name="in_patient_encounters" value= "In Patient">  In Patient
+                            </li>
+                            <li  style="padding-top:15px; padding-bottom:15px; padding-left:30px">
+                                <input type="checkbox" id="radio_encounters" name="out_patient_encounters" value = "Out Patient">  Out Patient
+                            </li>
+                            <li  style="padding-top:15px; padding-bottom:15px; padding-left:30px">
+                                <input type="checkbox" id="radio_encounters" name="nips_patient_encounters" value = "NIPS">  NIPS
+                            </li>
+                            <!--<li  style="padding-top:15px; padding-bottom:15px; padding-left:30px">
+                                <input type="radio" id="radio_encounters" name="radio_encounters" value = "Emergency Department">  Emergency Department
+                            </li>
+                            -->
+                        </ul>
+                    </li>
+                    <li class='dark'>
+                        <a href="javascript:;" data-toggle="collapse" data-target="#demo"><i class="fa fa-fw fa-arrows-v"></i>Diagnostic Groups<i class="fa fa-fw fa-caret-down"></i></a>
+                            <ul id="demo" class="collapse" style="color:white">
+                                <!-- 
+                                    <li>
+                                        <a href=# id="weathericon" class="selected" onclick="toggleLayer('WeatherLayer');">
+                                        <img src="images/icons/weather.png" />Local Weather
+                                        <br />
+                                        </a>
+                                    </li>
+                                -->
+
+                        <!-- <a href=#  id="busicon" onclick="toggleLayer('CTATrackerLayer');"><img src="images/icons/bus.png" />CTA Bus Tracker<br/></a> -->
+                                <li style="padding-top:15px; padding-bottom:15px; padding-left:30px">
+                                    <!-- <a href=# id="AsthmaIcon" onclick="toggleLayer('AsthmaLayer');"> -->
+                                    <input type="radio" id="diagnostic_group" name="diagnostic_group" value= "Asthma">
+                                    <img src="images/icons/Asthma.png" height="42" width="42"/>Asthma
+                                    <br />
+                                    </a>
+                                </li>
+
+                                <li style="padding-top:15px; padding-bottom:15px; padding-left:30px">
+                                    <!-- <a href=# id="DiabetesIcon" onclick="toggleLayer('DiabetesLayer');"> -->
+                                    <input type="radio" id="diagnostic_group" name="diagnostic_group" value= "Diabetes">
+                                    <img src="images/icons/Diabetes.png" height="42" width="42"/>Diabetes
+                                    <br />
+                                    </a>
+                                    </li>
+                                <li style="padding-top:15px; padding-bottom:15px; padding-left:30px">
+                                    <!-- <a href=# id="SCDIcon" onclick="toggleLayer('SCDLayer');"> -->
+                                    <input type="radio" id="diagnostic_group" name="diagnostic_group" value= "SCD">
+                                    <img src="images/icons/SCD.png" height="42" width="42"/>SCD
+                                    <br />
+                                    </a>
+                                    </li>
+
+                                <li style="padding-top:15px; padding-bottom:15px; padding-left:30px">
+                                   <!-- <a href=# id="OtherIcon" onclick="toggleLayer('OtherLayer');"> -->
+                                    <input type="radio" id="diagnostic_group" name="diagnostic_group" value= "Other_Group">
+                                    <img src="images/icons/Other.png" height="42" width="42"/>Other Groups
+                                    <br />
+                                    </a>
+                                </li>
+
+
+                            </ul>
+                    </li>
+                
+                    <!--
+                    <li>
+                        <a href="javascript:;" data-toggle="collapse" data-target="#demo22"><i class="fa fa-fw fa-arrows-v"></i> Dropdown <i class="fa fa-fw fa-caret-down"></i></a>
+                        <ul id="demo22" class="collapse">
+                            
+                            <li>
+                                <a href=# id="CitiesIcon" onclick="toggleLayer('CitiesLayer');">
+                                    <img src="images/icons/cities.png" height="42" width="42"/>Chicago
+                                    <br />
+                                </a>
+                            </li>
+                            <li>
+                                <a href=# id="CountyIcon" onclick="toggleLayer('CountyLayer');">
+                                    <img src="images/icons/county.png" height="42" width="42" />Counties
+                                    <br />
+                                </a>
+                            </li>
+                            <li>
+
+                                <a href=# id="ZipcodeIcon" onclick="toggleLayer('ZipCodeLayer');">
+                                    <img src="images/icons/zip.png" height="42" width="42" />Zip Code
+                                    <br />
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    -->
+                    <li class='active'> 
+                        
+                        <a href=# id="DisplayIcon" onclick="toggleLayer('DisplayLayer');"> 
+                        <b>Display on Map</b></a>
+                    </li>
+                    <!--                    <li>
+                        <a href='#'><i class='fa fa-fw fa-file'></i> Blank Page</a>
+                    </li>-->
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </nav>
+        </div>
+        <div id="page-wrapper">
+           <!-- <p style="visibility:hidden;">ETC</p> -->
+            <div class="container-fluid" >
+                <div id="map">
+                </div>
+            </div>
+        </div>
+
+        
+    <!-- <div id="lineupdate"><button onclick="mapContainer.getPolyLineFunc()">Update Route</button></div> -->
+    <!--
+<div id="ctaerror"><center>We seem to have exhausted our CTA Bus Tracker queries for the day.  Please check back tomorrow for a fully functional bus tracker.</center></div>
+-->
+
+    </div>
+    <!-- /#wrapper -->
+
+    <!-- Script Tags -->  
+    
+    <script>
+                d3.select("#uihpview_select").on("click", function() {
+
+                    mapContainer.mode = 'UIHP';
+                    var mode = mapContainer.mode;
+                    /*
+                    if (document.getElementById('zipview_select').checked || document.getElementById('countiesview_select').checked || document.getElementById('neighborview_select').checked) {
+                        mapContainer.resetLayers();
+                        if (document.getElementById("AsthmaIcon").className = "selected") {
+                            jQuery('#AsthmaIcon').toggleClass("selected", 1000, "easeOutSine");
+                        }
+                        if (document.getElementById("DiabetesIcon").className = "selected") {
+                            jQuery('#DiabetesIcon').toggleClass("selected", 1000, "easeOutSine");
+                        }
+                        if (document.getElementById("SCDIcon").className = "selected") {
+                            jQuery('#SCDIcon').toggleClass("selected", 1000, "easeOutSine");
+                        }
+                        if (document.getElementById("OtherIcon").className = "selected") {
+                            jQuery('#OtherIcon').toggleClass("selected", 1000, "easeOutSine");
+                        }
+                        if (document.getElementById("ZipcodeIcon").className = "selected") {
+                            jQuery('#ZipcodeIcon').toggleClass("selected", 1000, "easeOutSine");
+                        }
+
+
+                    }
+                    */
+                    zipCodeApp.callzipPHP(mode);
+                    /*
+                    if (document.getElementById('zipview_select').checked) {
+                        $('#zipview_select').attr('checked', false);
+                    } else if (document.getElementById('countiesview_select').checked) {
+                        $('#countiesview_select').attr('checked', false);
+                    } else if (document.getElementById('neighborview_select').checked) {
+                        $('#neighborview_select').attr('checked', false);
+                    }*/
+                    
+                    /*if(document.getElementById('zipview_select').checked){
+                console.log("ZIPVIEW ");
+                zipCodeApp.zipFeatureFunc();
+                zipCodeApp.zipAsthmaFunc();
+                zipCodeApp.zipDiabetesFunc();
+                zipCodeApp.zipSCDFunc();
+                zipCodeApp.zipOtherFunc();
+
+
+                zipCodeApp.drawChart();
+            }
+            else if (document.getElementById('countiesview_select').checked){
+                console.log("inside counties view");
+            }
+            else if (document.getElementById('neighborview_select').checked){
+                console.log("inside Neighborhoods view");
+            }*/
+                    //mapContainer.iterator = 1;
+                    //potHoleApp.callChicagoData()
+                    weatherLoop = setInterval(function() {
+                        updateWeather();
+                    }, 30000);
+
+                });
+
+                 ///////////////
+
+                d3.select("#eligibleview_select").on("click", function() {
+
+                    mapContainer.mode = 'ELIGIBLE';
+                    var mode = mapContainer.mode;
+                    zipCodeApp.callzipPHP(mode);
+                    /*
+                    if (document.getElementById('zipview_select').checked || document.getElementById('countiesview_select').checked || document.getElementById('neighborview_select').checked) {
+                        mapContainer.resetLayers();
+                        if (document.getElementById("AsthmaIcon").className = "selected") {
+                            jQuery('#AsthmaIcon').toggleClass("selected", 1000, "easeOutSine");
+                        }
+                        if (document.getElementById("DiabetesIcon").className = "selected") {
+                            jQuery('#DiabetesIcon').toggleClass("selected", 1000, "easeOutSine");
+                        }
+                        if (document.getElementById("SCDIcon").className = "selected") {
+                            jQuery('#SCDIcon').toggleClass("selected", 1000, "easeOutSine");
+                        }
+                        if (document.getElementById("OtherIcon").className = "selected") {
+                            jQuery('#OtherIcon').toggleClass("selected", 1000, "easeOutSine");
+                        }
+                        if (document.getElementById("ZipcodeIcon").className = "selected") {
+                            jQuery('#ZipcodeIcon').toggleClass("selected", 1000, "easeOutSine");
+                        }
+
+                    }
+
+                    if (document.getElementById('zipview_select').checked) {
+
+                        $('#zipview_select').attr('checked', false);
+                    } else if (document.getElementById('countiesview_select').checked) {
+                        $('#countiesview_select').attr('checked', false);
+                    } else if (document.getElementById('neighborview_select').checked) {
+                        $('#neighborview_select').attr('checked', false);
+                    }
+
+                    */
+                    //mapContainer.iterator = 1;
+                    //potHoleApp.callChicagoData()
+                    weatherLoop = setInterval(function() {
+                        updateWeather();
+                    }, 30000);
+
+                });
+                d3.select("#enrolledview_select").on("click", function() {
+
+                    mapContainer.mode = 'ENROLLED';
+                    var mode = mapContainer.mode;
+                    zipCodeApp.callzipPHP(mode);
+                    //mapContainer.iterator = 1;
+                    //potHoleApp.callChicagoData()
+
+                    /*
+                    if (document.getElementById('zipview_select').checked || document.getElementById('countiesview_select').checked || document.getElementById('neighborview_select').checked) {
+                        mapContainer.resetLayers();
+                        if (document.getElementById("AsthmaIcon").className = "selected") {
+                            jQuery('#AsthmaIcon').toggleClass("selected", 1000, "easeOutSine");
+                        }
+                        if (document.getElementById("DiabetesIcon").className = "selected") {
+                            jQuery('#DiabetesIcon').toggleClass("selected", 1000, "easeOutSine");
+                        }
+                        if (document.getElementById("SCDIcon").className = "selected") {
+                            jQuery('#SCDIcon').toggleClass("selected", 1000, "easeOutSine");
+                        }
+                        if (document.getElementById("OtherIcon").className = "selected") {
+                            jQuery('#OtherIcon').toggleClass("selected", 1000, "easeOutSine");
+                        }
+                        if (document.getElementById("ZipcodeIcon").className = "selected") {
+                            jQuery('#ZipcodeIcon').toggleClass("selected", 1000, "easeOutSine");
+                        }
+
+
+                    }
+
+                    if (document.getElementById('zipview_select').checked) {
+
+                        $('#zipview_select').attr('checked', false);
+                    } else if (document.getElementById('countiesview').checked) {
+                        $('#countiesview_select').attr('checked', false);
+                    } else if (document.getElementById('neighborview_select').checked) {
+                        $('#neighborview_select').attr('checked', false);
+                    }
+                    */
+                    weatherLoop = setInterval(function() {
+                        updateWeather();
+                    }, 30000);
+
+                });
+                d3.select("#points_select").on("click", function() {
+                    window.UIMode = "points";
+                    window.started = true;
+                    window.starttime = moment();
+                    window.lastupdate = window.starttime;
+                    window.updates = [];
+                    mapContainer.mode = 'Box';
+                    mapContainer.mode = 'ZIP';
+                    //mapContainer.iterator = 1;
+
+
+                    mapContainer.getPolygonDataFunc();
+                    //potHoleApp.callChicagoData()
+                    weatherLoop = setInterval(function() {
+                        updateWeather();
+                    }, 30000);
+
+                });
+                 //
+                 // CHOOSING ZIPCODE-CHICAGO VIEW
+                 //
+                 //var zipcodeJson ="";
+                var variable = 1;
+                
+                d3.select("#zipview_select").on("click", function() {
+
+                    var prefix = d3.formatPrefix(10000000);
+                    //console.log(prefix);
+                    //console.log(prefix.symbol);
+                    //console.log(prefix.scale(prefix));
+
+                    console.log("Inside Zip View Select");
+                    //mapContainer.zipBoundaryDisplayFunc();
+                    //Getting data from PHP File 
+
+                    //console.log(ZipCodeApp.zipcodeJson);
+
+
+                    ////
+
+                    zipCodeApp.zipFeatureFunc();
+                    //zipCodeApp.zipAsthmaFunc();
+                    zipCodeApp.zipDiabetesFunc();
+                    zipCodeApp.zipSCDFunc();
+                    zipCodeApp.zipOtherFunc();
+
+
+                    d3.select("barchart").html(null);
+                    zipCodeApp.drawChart();
+
+                    //zipCodeApp.createLegends();
+
+                    // When PHP connection to database is available.
+                    // mapContainer.callzipPHP();
+
+                    //mapContainer.getPolygonDataFunc();
+                    //potHoleApp.callChicagoData()
+                    weatherLoop = setInterval(function() {
+                        updateWeather();
+                    }, 30000);
+
+                }); 
+
+                 // CHOOSING NEIGHBOURHOOD VIEW
+                d3.select("#neighborview_select").on("click", function() {
+                    window.UIMode = "paths";
+                    mapContainer.mode = 'Path';
+                    //mapContainer.iterator = 2;
+                    mapContainer.createPolyLine();
+
+                    window.starttime = moment();
+                    window.lastupdate = window.starttime;
+                    window.updates = [];
+                    //potHoleApp.callChicagoData()
+                    setTimeout(function() {
+                        mapContainer.getPolyLineFunc()
+                    }, 1000);
+                    /*  
+                $("#lineupdate").toggle();
+                weatherLoop = setInterval(function() {
+                    updateWeather();
+                }, 30000);
+        */
+                });
+
+
+                 // CHOOSING COUNTIES VIEW
+                d3.select("#countiesview_select").on("click", function() {
+                    window.UIMode = "paths";
+                    mapContainer.mode = 'Path';
+                    //mapContainer.iterator = 2;
+                    illinoisCountyApp.countyFeatureFunc();
+                    illinoisCountyApp.countyAsthmaFunc();
+                    illinoisCountyApp.countyDiabetesFunc();
+                    illinoisCountyApp.countySCDFunc();
+                    illinoisCountyApp.countyOtherFunc();
+
+                    weatherLoop = setInterval(function() {
+                        updateWeather();
+                    }, 30000);
+                });
+                 /////    
+                 // Creates the buttonset.
+                 /////
+                $("#").buttonset()
+
+                 // Adds our custom CSS class which changes the orientation.
+                .addClass("ui-buttonset-vertical")
+
+                 // Remove the corner classes that don't amke sense with the new layout.
+                .find("label").removeClass("ui-corner-left ui-corner-right")
+
+                 // Hack needed to adjust the top border on the next label uring hover.
+                .on("mouseenter", function(e) {
+                    $(this).next().next().addClass("ui-transparent-border-top");
+                })
+
+                 // Hack needed to adjust the top border on the next label uring hover.
+                .on("mouseleave", function(e) {
+                    $(this).next().next().removeClass("ui-transparent-border-top");
+                })
+
+                 // Apply proper corner styles.
+                .filter(":first").addClass("ui-corner-top")
+                    .end()
+                    .filter(":last").addClass("ui-corner-bottom");
+                /*
+     function (){
+        if (d3.select("#sidebar-right").style("width") == "500px") {
+          d3.select("#sidebar-right").style("width", "200px");
+          d3.select("#extrapaintoggle").html("<a href=#>&darr; less graphs &darr;</a>");
+          $('#extrapain').toggle("fold");
+      } else {
+          d3.select("#sidebar-right").style("width", "500px");
+          d3.select("#extrapaintoggle").html("<a href=#>&uarr; more graphs &uarr;</a>");
+          $('#extrapain').toggle("fold");
+      }
+  } */
+    </script>
+    <script>
+        //console.log("Calling the map js");
+
+        var mapContainer;
+
+         /////////////////////
+
+         // Variables for Different Views                   
+        var zipCodeApp;
+        var illinoisCountyApp;
+
+         //console.log('Inside Init1');
+
+        function init() {
+            console.log('Inside Init2');
+
+            mapContainer = new mapContainer();
+            mapContainer.init('map');
+
+            // Getting data for ZipCodes in Chicago
+            zipCodeApp = new ZipCodeApp();
+            zipCodeApp.init();
+
+            // Getting County Level Information for Illinois
+            illinoisCountyApp = new IllinoisCountyApp();
+            illinoisCountyApp.init();
+
+            $(function() {
+                $('#stacked').highcharts({
+                    chart: {
+                        type: 'column'
+                    },
+
+                    title: {
+                        text: 'Participants Barometer'
+                    },
+
+                    xAxis: {
+                        categories: ['Number of Participants']
+                    },
+
+                    yAxis: {
+                        allowDecimals: false,
+                        min: 0,
+                        title: {
+                            text: 'Total'
+                        }
+                    },
+
+                    tooltip: {
+                        formatter: function() {
+                            return '<b>' + this.x + '</b><br/>' +
+                                this.series.name + ': ' + this.y + '<br/>' +
+                                'UIHP: ' + this.point.stackTotal;
+                        }
+                    },
+
+                    plotOptions: {
+                        column: {
+                            stacking: 'normal'
+                        }
+                    },
+
+                    series: [{
+                        name: 'UIHP',
+                        data: [23000],
+                        dtotal: [23000],
+                        stack: 'Data'
+                    }, {
+                        name: 'CHECK-Eligible',
+                        data: [1500],
+                        dtotal: [23000],
+                        stack: 'Data'
+                    }, {
+                        name: 'CHECK-Enrolled',
+                        data: [700],
+                        dtotal: [23000],
+                        stack: 'Data'
+                    }]
+                });
+            });
+
+            //var zipCodeFile = "./data/zipCode.php";
+            //zipCodeApp.callzipPHP();
+
+        }
+    </script>
+    <script src="js/weather.js"></script>
+    <script src="js/mapContainer.js"></script>
+    <script src="js/IllinoisCountyApp.js"></script>
+    <script src="js/suncalc.js"></script>
+    <script src="js/layers.js"></script>
+    <script src="js/ZipCodeApp.js"></script>
+    <!--<script src="js/sprite.coffee"></script>-->
+    <!-- <script src="js/script.coffee"></script>-->
+    <script type="text/javascript">
+        $('#uihpview_select').click(function(event){
+            //$('#client').css("background-color","#A22929");
+            $('#uihpview_select').css("background-color","#A22929");
+            $('#eligibleview_select').css("background-color","#222222");
+            $('#enrolledview_select').css("background-color","#222222");
+  
+        });
+         $('#eligibleview_select').click(function(event){
+            //$('#client').css("background-color","#A22929");
+            $('#eligibleview_select').css("background-color","#A22929");
+            $('#uihpview_select').css("background-color","#222222");
+            $('#enrolledview_select').css("background-color","#222222");
+  
+        });
+        $('#enrolledview_select').click(function(event){
+            //$('#client').css("background-color","#A22929");
+            $('#enrolledview_select').css("background-color","#A22929");
+            $('#eligibleview_select').css("background-color","#222222");
+            $('#uihpview_select').css("background-color","#222222");
+  
+        });
+        $('#zipview_select').click(function(event){
+            $('#zipview_select').css("background-color","#A22929");
+            $('#neighborhoods').css("background-color","#A22929");
+            $('#counties').css("background-color","#222222");
+        });
+        $('#neighborhoods').click(function(event){
+            $('#neighborhoods').css("background-color","#A22929");
+            $('#zipview_select').css("background-color","#A22929");
+            $('#counties').css("background-color","#222222");
+        });
+        $('#counties').click(function(event){
+            $('#counties').css("background-color","#A22929");
+            $('#neighborhoods').css("background-color","#A22929");
+            $('#zipview_select').css("background-color","#222222");
+        });
+        $('#demo').click(function(event){
+            $('#demo').css("background-color","#A22929");
+        });
+        $('#encounter').click(function(event){
+            $('#encounter').css("background-color","#A22929");
+        });
+        $('#ages').click(function(event){
+            $('#ages').css("background-color","#A22929");
+        });
+    </script>
+    <script>
+        setTimeout(function() {
+            //toggleLayer('PotHolesLayer');
+            mapContainer.marLat1 = 41.867935;
+            mapContainer.marLng1 = -87.647939;
+            mapContainer.marLat2 = 41.861662;
+            mapContainer.marLng2 = -87.614989;
+
+            $("#lineupdate").toggle();
+            weatherLoop = setInterval(function() {
+                updateWeather();
+            }, 30000);
+        }, 1000);
+    </script>
+
+        <script>
+            $("#menu-toggle").click(function(e) {
+                e.preventDefault();
+                $("#wrapper").toggleClass("toggled");
+            });
+        </script>
+
+</body>
+
+</html>
